@@ -2,8 +2,7 @@ defmodule AdventOfCode.Day02 do
   def input_decode(inputs) do
     inputs
     |> Enum.map(&String.split(&1, ": "))
-    |> Enum.map(
-    fn [pol, pass] ->
+    |> Enum.map(fn [pol, pass] ->
       [r, char] = String.split(pol)
       [lo, hi] = String.split(r, "-") |> Enum.map(&String.to_integer/1)
       {{:policy, lo, hi, char}, pass}
@@ -17,19 +16,23 @@ defmodule AdventOfCode.Day02 do
   def xor_bool(a, b) do
     (a and not b) or (not a and b)
   end
-  
+
   def part1(list) do
     count(
       fn {{:policy, lo, hi, c}, pass} ->
         count(&(&1 === hd(to_charlist(c))), to_charlist(pass)) <= hi and
-        count(&(&1 === hd(to_charlist(c))), to_charlist(pass)) >= lo
-      end, list)
+          count(&(&1 === hd(to_charlist(c))), to_charlist(pass)) >= lo
+      end,
+      list
+    )
   end
 
   def part2(list) do
     count(
       fn {{:policy, p1, p2, c}, pass} ->
-        xor_bool(String.at(pass, p1-1) == c, String.at(pass, p2-1) == c)
-      end, list)
+        xor_bool(String.at(pass, p1 - 1) == c, String.at(pass, p2 - 1) == c)
+      end,
+      list
+    )
   end
 end
