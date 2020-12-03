@@ -1,28 +1,39 @@
 module Day03 where
 
-r3d1 :: [String] -> Int -> Int
-r3d1 [x] n = if x !! (3 * n) == '#' then 1 else 0
-r3d1 (_ : xs) n = if head xs !! (3 * n) == '#' then 1 + r3d1 xs (n + 1) else 0 + r3d1 xs (n + 1)
+import qualified Data.Set as Set
 
-r1d1 :: [String] -> Int -> Int
-r1d1 [x] n = if x !! (1 * n) == '#' then 1 else 0
-r1d1 (_ : xs) n = if head xs !! (1 * n) == '#' then 1 + r1d1 xs (n + 1) else 0 + r1d1 xs (n + 1)
+type Pos = (Int, Int)
 
-r5d1 :: [String] -> Int -> Int
-r5d1 [x] n = if x !! (5 * n) == '#' then 1 else 0
-r5d1 (_ : xs) n = if head xs !! (5 * n) == '#' then 1 + r5d1 xs (n + 1) else 0 + r5d1 xs (n + 1)
+addPos :: Pos -> Pos -> Pos
+addPos (x, y) (x', y') = (x + x', y + y')
 
-r7d1 :: [String] -> Int -> Int
-r7d1 [x] n = if x !! (7 * n) == '#' then 1 else 0
-r7d1 (_ : xs) n = if head xs !! (7 * n) == '#' then 1 + r7d1 xs (n + 1) else 0 + r7d1 xs (n + 1)
+data Grid = Grid
+  { tree :: Set.Set Pos,
+    width :: Int,
+    height :: Int
+  }
+  deriving (Show)
 
-r1d2 :: [String] -> Int -> Int
-r1d2 [_] _ = 0
-r1d2 [_, x] n = if x !! (1 * n) == '#' then 1 else 0
-r1d2 (_ : _ : xs) n = if head xs !! (1 * n) == '#' then 1 + r1d2 xs (n + 1) else 0 + r1d2 xs (n + 1)
+isTree :: Grid -> Pos -> Bool
+isTree (Grid tree w _) (x, y) = Set.member (x `mod` w, y) tree
 
-part1 :: [String] -> Int
-part1 input = r3d1 input 1
+isInBounds :: Grid -> Pos -> Bool
+isInBounds (Grid _ _ h) (_, y) = y >= 0 && y < h
 
-part2 :: [String] -> Int
-part2 input = r1d1 input 1 * r3d1 input 1 * r5d1 input 1 * r7d1 input 1 * r1d2 input 1
+inputToGrid :: [String] -> Grid
+inputToGrid lines =
+  let positions = concat . zipWith (\y line -> zipWith (\x c -> ((x, y), c)) [0 ..] line) [0 ..] $ lines
+      treePosOnly = Set.fromList . map fst . filter ((== '#') . snd) $ positions
+      width = length . head $ lines
+      height = length lines
+   in Grid {tree = treePosOnly, width = width, height = height}
+
+encounterTree :: Grid -> Pos -> Int
+encounterTree grid step =
+  length . filter (isTree grid) . takeWhile (isInBounds grid) . iterate (addPos step) $ (0, 0)
+
+part1 :: Grid -> Int
+part1 grid = encounterTree grid (3, 1)
+
+part2 :: Grid -> Int
+part2 grid = product . map (encounterTree grid) $ [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
