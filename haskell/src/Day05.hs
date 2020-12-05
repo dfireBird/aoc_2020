@@ -1,5 +1,7 @@
 module Day05 where
 
+import Data.List
+
 findRows :: String -> Int -> Int -> Int
 findRows [] lo hi = lo
 findRows (x : xs) lo hi =
@@ -23,7 +25,8 @@ findSeatId bpass =
 part1 :: [String] -> Int
 part1 = maximum . map findSeatId
 
-part2 :: [String] -> [Int]
+part2 :: [String] -> Int
 part2 input =
-  let seatIds = map findSeatId input
-   in filter (`notElem` seatIds) [0 .. 1023]
+  let seatIds = sort . map findSeatId $ input
+      seatId = foldl (\acc x -> if x - acc == 1 then x else acc) (head seatIds - 1) seatIds
+   in seatId + 1
