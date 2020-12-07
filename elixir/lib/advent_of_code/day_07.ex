@@ -11,7 +11,6 @@ defmodule AdventOfCode.Day07 do
 
   def part1(txt) do
     bags = txt |> input_to_map
-    # |> MapSet.new() |> MapSet.size()
     Enum.reduce(Map.keys(bags), [], fn x, acc ->
       if search_bag(x, bags), do: [x] ++ acc, else: acc
     end)
