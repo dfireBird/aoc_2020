@@ -18,7 +18,7 @@ inputToEveryone :: String -> [GroupAnswer]
 inputToEveryone txt =
   let group = splitOn "\n\n" txt
       groupAnswer = map (map Set.fromList . words) group
-      everyGroup = map (\(x : xs) -> foldl Set.intersection x xs) groupAnswer
+      everyGroup = map (foldl1 Set.intersection) groupAnswer
    in everyGroup
 
 inputToAnyone :: String -> [GroupAnswer]
