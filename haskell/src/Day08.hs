@@ -43,7 +43,7 @@ replaceIns i ins
      in replace ins i new
 
 part1 :: [Instruction] -> Int
-part1 ins = fromMaybe 0 (execute1 ins 0 0 S.empty)
+part1 ins = execute1 ins 0 0 S.empty
 
 part2 :: [Instruction] -> Maybe Int
 part2 ins = part2' ins 0
