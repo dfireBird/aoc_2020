@@ -4,13 +4,9 @@ import Data.List
 import qualified Data.Map as M
 import Data.Maybe
 
-count1s :: [Int] -> Int -> Int
-count1s [] _ = 0
-count1s (x : xs) pre = if x - pre == 1 then 1 + count1s xs x else 0 + count1s xs x
-
-count3s :: [Int] -> Int -> Int
-count3s [] _ = 0
-count3s (x : xs) pre = if x - pre == 3 then 1 + count3s xs x else 0 + count3s xs x
+count :: Int -> [Int] -> Int -> Int
+count _ [] _ = 0
+count n (x : xs) pre = if x - pre == n then 1 + count n xs x else 0 + count n xs x
 
 ways :: [Int] -> [(Int, [Int])] -> M.Map Int Int -> M.Map Int Int
 ways [] _ paths = paths
@@ -28,9 +24,8 @@ ways (x : xs) ports paths =
 
 part1 :: [Int] -> Int
 part1 input =
-  let ones = count1s input 0
-      threes = count3s input 0 + 1
-   in ones * threes
+  count 1 input 0
+    * (count 3 input 0 + 1)
 
 part2 :: [Int] -> Maybe Int
 part2 input =
