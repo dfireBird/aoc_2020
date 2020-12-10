@@ -39,8 +39,10 @@ defmodule AdventOfCode.Day08 do
   defp part2(ins, i) do
     case run(replaceIns(ins, i), 0, 0, MapSet.new()) do
       {:infinte_loop, _, _} ->
-        part2(ins, i+1)
-      {:term, acc, pos} -> acc
+        part2(ins, i + 1)
+
+      {:term, acc, pos} ->
+        acc
     end
   end
 
