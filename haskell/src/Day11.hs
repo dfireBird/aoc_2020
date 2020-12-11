@@ -11,7 +11,7 @@ data Grid = Grid
   }
   deriving (Show, Eq)
 
-pos = concatMap (\x -> zip (repeat x) [0 .. 89]) [0 .. 92]
+pos = concatMap (\x -> zip (repeat x) [0 .. 99]) [0 .. 99]
 
 adjacent :: Pos -> Int -> [Pos]
 adjacent (x, y) n = [(x - n, y), (x + n, y), (x, y - n), (x, y + n), (x + n, y + n), (x + n, y - n), (x - n, y + n), (x - n, y - n)]
