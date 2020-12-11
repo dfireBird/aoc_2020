@@ -22,31 +22,6 @@ line (x, y) (x', y') = map (\a -> (x + x' * a, y + y' * a)) [1 .. 93]
 adjacentLines :: Pos -> S.Set Pos -> [Pos]
 adjacentLines pos seats = map ((\x -> if null x then (-1, -1) else head x) . dropWhile (not . (`S.member` seats)) . line pos) [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
 
-part2 :: Grid -> Int
-part2 grid =
-  let (floor', occu', free') = foldl (part2' grid) (floorP grid, occupied grid, free grid) pos
-      newGrid = Grid {floorP = floor', occupied = occu', free = free'}
-   in if newGrid == grid
-        then S.size (occupied grid)
-        else part2 newGrid
-  where
-    part2' (Grid _ oOcc oFree) (cFloor, cOcc, cFree) pos
-      | pos `S.member` oFree = checkFree pos oOcc (cFloor, cOcc, cFree)
-      | pos `S.member` oOcc = checkOcc pos oOcc (cFloor, cOcc, cFree)
-      | otherwise = (cFloor, cOcc, cFree)
-
-    checkFree :: Pos -> S.Set Pos -> (S.Set Pos, S.Set Pos, S.Set Pos) -> (S.Set Pos, S.Set Pos, S.Set Pos)
-    checkFree pos occu (cFloor, cOcc, cFree) =
-      if all (== False) . map (`S.member` occu) $ filter (/= (-1, -1)) $ adjacentLines pos (S.union cOcc cFree)
-        then (cFloor, S.insert pos cOcc, S.delete pos cFree)
-        else (cFloor, cOcc, cFree)
-
-    checkOcc :: Pos -> S.Set Pos -> (S.Set Pos, S.Set Pos, S.Set Pos) -> (S.Set Pos, S.Set Pos, S.Set Pos)
-    checkOcc pos occ (cFloor, cOcc, cFree) =
-      if (length . filter (== True) . map (`S.member` occ) $ filter (/= (-1, -1)) $ adjacentLines pos (S.union cOcc cFree)) >= 5
-        then (cFloor, S.delete pos cOcc, S.insert pos cFree)
-        else (cFloor, cOcc, cFree)
-
 part1 :: Grid -> Int
 part1 grid =
   let (floor', occu', free') = foldl (part1' grid) (floorP grid, occupied grid, free grid) pos
@@ -70,6 +45,34 @@ part1 grid =
     checkFree pos occu (cFloor, cOcc, cFree) =
       if all (== False) . map (`S.member` occu) $ adjacent pos 1
         then (cFloor, S.insert pos cOcc, S.delete pos cFree)
+        else (cFloor, cOcc, cFree)
+
+part2 :: Grid -> Int
+part2 grid = part2' grid (S.union (occupied grid) (free grid))
+  where
+    part2' :: Grid -> S.Set Pos -> Int
+    part2' grid seats =
+      let (floor', occu', free') = foldl (part2'Helper grid seats) (floorP grid, occupied grid, free grid) pos
+          newGrid = Grid {floorP = floor', occupied = occu', free = free'}
+       in if newGrid == grid
+            then S.size (occupied grid)
+            else part2' newGrid seats
+
+    part2'Helper (Grid _ oOcc oFree) seats (cFloor, cOcc, cFree) pos
+      | pos `S.member` oFree = checkFree pos oOcc (cFloor, cOcc, cFree) seats
+      | pos `S.member` oOcc = checkOcc pos oOcc (cFloor, cOcc, cFree) seats
+      | otherwise = (cFloor, cOcc, cFree)
+
+    checkFree :: Pos -> S.Set Pos -> (S.Set Pos, S.Set Pos, S.Set Pos) -> S.Set Pos -> (S.Set Pos, S.Set Pos, S.Set Pos)
+    checkFree pos occu (cFloor, cOcc, cFree) seats =
+      if all (== False) . map (`S.member` occu) $ filter (/= (-1, -1)) $ adjacentLines pos seats
+        then (cFloor, S.insert pos cOcc, S.delete pos cFree)
+        else (cFloor, cOcc, cFree)
+
+    checkOcc :: Pos -> S.Set Pos -> (S.Set Pos, S.Set Pos, S.Set Pos) -> S.Set Pos -> (S.Set Pos, S.Set Pos, S.Set Pos)
+    checkOcc pos occ (cFloor, cOcc, cFree) seats =
+      if (length . filter (== True) . map (`S.member` occ) $ filter (/= (-1, -1)) $ adjacentLines pos seats) >= 5
+        then (cFloor, S.delete pos cOcc, S.insert pos cFree)
         else (cFloor, cOcc, cFree)
 
 parseInput :: String -> Grid
