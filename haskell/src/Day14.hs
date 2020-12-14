@@ -9,19 +9,16 @@ import Data.Word
 data Instruction = Mask [(Int, Char)] | Mem Word64 Integer deriving (Show)
 
 part1 :: [Instruction] -> Integer
-part1 inst =
-  let mem = simulate inst Map.empty []
-   in sum $ Map.filter (/= 0) mem
+part1 = sum . Map.filter (/= 0) . fst . foldl' simulate (Map.empty, [])
   where
-    simulate :: [Instruction] -> Map.Map Word64 Integer -> [(Int, Char)] -> Map.Map Word64 Integer
-    simulate [] memory _ = memory
-    simulate (x : xs) memory mask =
+    simulate :: (Map.Map Word64 Integer, [(Int, Char)]) -> Instruction -> (Map.Map Word64 Integer, [(Int, Char)])
+    simulate (memory, mask) x =
       case x of
-        Mask opval -> simulate xs memory opval
+        Mask opval -> (memory, opval)
         Mem addr opval ->
           let val = foldl' maskBit opval mask
               newMemory = Map.insert addr val memory
-           in simulate xs newMemory mask
+           in (newMemory, mask)
       where
         maskBit :: Integer -> (Int, Char) -> Integer
         maskBit acc (bN, bitVal) = case bitVal of
@@ -30,19 +27,16 @@ part1 inst =
           'X' -> acc
 
 part2 :: [Instruction] -> Integer
-part2 inst =
-  let mem = simulate inst Map.empty []
-   in sum $ Map.filter (/= 0) mem
+part2 = sum . Map.filter (/= 0) . fst . foldl' simulate (Map.empty, [])
   where
-    simulate :: [Instruction] -> Map.Map Word64 Integer -> [(Int, Char)] -> Map.Map Word64 Integer
-    simulate [] memory _ = memory
-    simulate (x : xs) memory mask =
+    simulate :: (Map.Map Word64 Integer, [(Int, Char)]) -> Instruction -> (Map.Map Word64 Integer, [(Int, Char)])
+    simulate (memory, mask) x =
       case x of
-        Mask opval -> simulate xs memory opval
+        Mask opval -> (memory, opval)
         Mem addr opval ->
           let val = foldl' maskBit [addr] mask
               newMemory = foldl' (\acc x -> Map.insert x opval acc) memory val
-           in simulate xs newMemory mask
+           in (newMemory, mask)
       where
         maskBit :: [Word64] -> (Int, Char) -> [Word64]
         maskBit acc (bN, bitVal) = case bitVal of
