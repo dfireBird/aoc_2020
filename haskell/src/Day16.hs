@@ -3,7 +3,6 @@ module Day16 where
 import Data.List
 import Data.List.Split
 import qualified Data.Map.Strict as M
-import qualified Data.Set as S
 
 type Ticket = [Int]
 
@@ -61,7 +60,7 @@ parseInput txt =
     parseField :: Rules -> String -> Rules
     parseField acc field =
       let [ruleString, range] = splitOn ": " field
-          rangeList = concatMap (\[x, y] -> [x .. y]) . map (map read . splitOn "-") . splitOn " or " $ range
+          rangeList = concatMap ((\[x, y] -> [x .. y]) . map read . splitOn "-") . splitOn " or " $ range
        in M.insert ruleString rangeList acc
 
     parseTicket :: String -> [Int]
