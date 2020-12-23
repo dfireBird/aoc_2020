@@ -17,7 +17,7 @@ maintainer:          me@dfirebird.codes
 extra-source-files:  CHANGELOG.md
 
 library
-  exposed-modules:     Aoc
+  exposed-modules:     Advent
                      , Day01
                      , Day02
                      , Day03
